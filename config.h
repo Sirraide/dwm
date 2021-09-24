@@ -65,6 +65,8 @@ static const char *termcmd[]  = { "terminator", NULL };
 static const char *start_opera[] = {"opera", NULL};
 static const char *start_vscode[] = {"code", NULL};
 
+static const char *screen_lock[] = {"xsecurelock", NULL};
+
 /* media keys */
 static const char *amixer_mute[] = {"amixer", "set", "Master", "toggle", NULL};
 static const char *amixer_increase[] = {"amixer", "set", "Master", "3+", NULL};
@@ -79,13 +81,14 @@ static Key keys[] = {
 	{ 0, 							XF86XK_AudioMute, spawn, {.v = amixer_mute } },
 	{ 0, 							XF86XK_AudioLowerVolume, spawn, {.v = amixer_decrease } },
 	{ 0, 							XF86XK_AudioRaiseVolume, spawn, {.v = amixer_increase } },
+	{ MODKEY, 						XK_l, 	   spawn, 		   {.v = screen_lock}},
 	{ MODKEY,                       XK_b,      togglebar,      {0} },
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
 	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
 	{ MODKEY,                       XK_i,      incnmaster,     {.i = +1 } },
 	{ MODKEY,                       XK_d,      incnmaster,     {.i = -1 } },
-	{ MODKEY,                       XK_h,      setmfact,       {.f = -0.05} },
-	{ MODKEY,                       XK_l,      setmfact,       {.f = +0.05} },
+	{ MODKEY|ShiftMask,             XK_h,      setmfact,       {.f = -0.05} },
+	{ MODKEY|ShiftMask,             XK_l,      setmfact,       {.f = +0.05} },
 	{ MODKEY,                       XK_Return, zoom,           {0} },
 	{ MODKEY,                       XK_Tab,    view,           {0} },
 	{ MODKEY|ShiftMask,             XK_c,      killclient,     {0} },
