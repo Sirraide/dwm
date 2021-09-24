@@ -30,7 +30,7 @@ static const Rule rules[] = {
 //	{ "Gimp",     NULL,       NULL,       0,            1,           -1 },
 //	{ "Firefox",  NULL,       NULL,       1 << 8,       0,           -1 },
 	{ "Opera",    NULL,       NULL,       1,            0,           -1 },
-	{ "Visual Studio Code", NULL, NULL, 0, 0, -1},
+	{ "Code", NULL, NULL, 1 << 2, 0, -1},
 };
 
 /* layout(s) */
@@ -59,9 +59,11 @@ static const Layout layouts[] = {
 
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
+
 static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, NULL };
 static const char *termcmd[]  = { "terminator", NULL };
 static const char *start_opera[] = {"opera", NULL};
+static const char *start_vscode[] = {"code", NULL};
 
 /* media keys */
 static const char *amixer_mute[] = {"amixer", "set", "Master", "toggle", NULL};
@@ -73,6 +75,7 @@ static Key keys[] = {
 	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
 	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },
 	{ MODKEY|ControlMask, 			XK_o,	   spawn,		   {.v = start_opera } },
+	{ MODKEY|ControlMask, 			XK_c,	   spawn,		   {.v = start_vscode } },
 	{ 0, 							XF86XK_AudioMute, spawn, {.v = amixer_mute } },
 	{ 0, 							XF86XK_AudioLowerVolume, spawn, {.v = amixer_decrease } },
 	{ 0, 							XF86XK_AudioRaiseVolume, spawn, {.v = amixer_increase } },
