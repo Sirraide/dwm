@@ -79,6 +79,10 @@ static const char *amixer_mute[]	 = {"amixer", "set", "Master", "toggle", NULL};
 static const char *amixer_increase[] = {"amixer", "set", "Master", "3+", NULL};
 static const char *amixer_decrease[] = {"amixer", "set", "Master", "3-", NULL};
 
+// //    1.0  
+// static const char *brightness_decrease[] = {decrese_brightness, NULL};
+// static const char *brightness_increase[] = {"/home/ae/scripts/screen-brightness-increase.sh", NULL};
+
 static Key keys[] = {
 	/* modifier                     key        function        argument */
 	// Spawn programs
@@ -86,9 +90,15 @@ static Key keys[] = {
 	{MODKEY | ShiftMask, XK_Return, spawn, {.v = termcmd}},
 	{MODKEY | ControlMask, XK_o, spawn, {.v = start_opera}},
 	{MODKEY | ControlMask, XK_c, spawn, {.v = start_vscode}},
+
+	// Media
 	{0, XF86XK_AudioMute, spawn, {.v = amixer_mute}},
 	{0, XF86XK_AudioLowerVolume, spawn, {.v = amixer_decrease}},
 	{0, XF86XK_AudioRaiseVolume, spawn, {.v = amixer_increase}},
+	{0, XF86XK_MonBrightnessDown, change_brighness, {.f = -.1f}},
+	{0, XF86XK_MonBrightnessUp, change_brighness, {.f = .1f}},
+
+	// Miscellaneous
 	{MODKEY, XK_l, spawn, {.v = screen_lock}},
 
 	// Opacity
@@ -97,7 +107,6 @@ static Key keys[] = {
 	{MODKEY | ShiftMask, XK_f, spawn, SHCMD("transset-df -a .75")},
 
 	// Border
-
 	{MODKEY | ShiftMask, XK_v, setborderpx, {.i = -5}},
 	{MODKEY | ShiftMask, XK_b, setborderpx, {.i = 5}},
 
