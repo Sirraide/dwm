@@ -181,6 +181,7 @@ static void		arrangemon(Monitor *m);
 static void		attach(Client *c);
 static void		attachstack(Client *c);
 static void		buttonpress(XEvent *e);
+static void		change_brighness(const Arg *arg);
 static void		checkotherwm(void);
 static void		cleanup(void);
 static void		cleanupmon(Monitor *mon);
@@ -448,6 +449,20 @@ void buttonpress(XEvent *e) {
 		if (click == buttons[i].click && buttons[i].func && buttons[i].button == ev->button
 			&& CLEANMASK(buttons[i].mask) == CLEANMASK(ev->state))
 			buttons[i].func(click == ClkTagBar && buttons[i].arg.i == 0 ? &arg : &buttons[i].arg);
+}
+
+void change_brighness(const Arg *arg) {
+	static float brightness			   = 1.0f;
+	static char	 buffer[10];
+	static char *brightness_commmand[] = {"xrandr", "--output", "eDP-1", "--brightness", buffer, NULL};
+	memset(buffer, 0, sizeof buffer);
+
+	brightness += arg->f;
+	brightness = CLAMP(brightness, 0.1f, 1.0f);
+
+	sprintf(buffer, "%f", brightness);
+	const Arg a = {.v = brightness_commmand};
+	spawn(&a);
 }
 
 void checkotherwm(void) {
