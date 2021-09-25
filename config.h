@@ -77,7 +77,7 @@ static const char *amixer_mute[]	 = {"amixer", "set", "Master", "toggle", NULL};
 static const char *amixer_increase[] = {"amixer", "set", "Master", "3+", NULL};
 static const char *amixer_decrease[] = {"amixer", "set", "Master", "3-", NULL};
 
-// //    1.0  
+// //    1.0
 // static const char *brightness_decrease[] = {decrese_brightness, NULL};
 // static const char *brightness_increase[] = {"/home/ae/scripts/screen-brightness-increase.sh", NULL};
 
@@ -98,9 +98,8 @@ static Key keys[] = {
 
 	// Miscellaneous
 	{MODKEY, XK_l, lock_screen, {0}},
-	{MODKEY|ShiftMask, XK_p, do_update_statusbar, {0}}, 
-	{MODKEY|ShiftMask, XK_w, set_wallpaper, {0}}, 
-	
+	{MODKEY | ShiftMask, XK_p, do_update_statusbar, {0}},
+	{MODKEY | ShiftMask, XK_w, set_wallpaper, {0}},
 
 	// Opacity
 	{MODKEY | ShiftMask, XK_s, spawn, SHCMD("transset-df -a --dec .05")},

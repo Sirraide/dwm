@@ -263,7 +263,7 @@ static int		updategeom(void);
 static void		updatenumlockmask(void);
 static void		updatesizehints(Client *c);
 static void		updatestatus(void);
-static void 	do_update_statusbar(const Arg* ignored);
+static void		do_update_statusbar(const Arg *ignored);
 static void		updatetitle(Client *c);
 static void		updatewindowtype(Client *c);
 static void		updatewmhints(Client *c);
@@ -278,13 +278,13 @@ static void		zoom(const Arg *arg);
 /// EXTENSIONS
 pthread_t thread_update_status_bar;
 
-void atexit_thread_cancel(void);
+void		atexit_thread_cancel(void);
 static long get_num_between(char *str, char from, char to);
 static void kib_to_str(char *buffer, size_t kib, char digits);
-static void do_update_statusbar(const Arg* unused);
-void* thread_run_update_statusbar(void* unused);
-void set_wallpaper(const Arg* unused);
-void lock_screen(const Arg* unused);
+static void do_update_statusbar(const Arg *unused);
+void		 *thread_run_update_statusbar(void *unused);
+void		set_wallpaper(const Arg *unused);
+void		lock_screen(const Arg *unused);
 
 /* variables */
 static const char broken[] = "broken";
@@ -468,7 +468,7 @@ void buttonpress(XEvent *e) {
 }
 
 void change_brighness(const Arg *arg) {
-	static float brightness			   = 1.0f;
+	static float brightness = 1.0f;
 	static char	 buffer[10];
 	static char *brightness_commmand[] = {"xrandr", "--output", "eDP-1", "--brightness", buffer, NULL};
 	memset(buffer, 0, sizeof buffer);
@@ -1266,9 +1266,9 @@ void run(void) {
 	/* main event loop */
 	XSync(dpy, False);
 
-	if(pthread_create(&thread_update_status_bar, NULL, thread_run_update_statusbar, NULL))
+	if (pthread_create(&thread_update_status_bar, NULL, thread_run_update_statusbar, NULL))
 		die("pthread:");
-	
+
 	atexit(atexit_thread_cancel);
 
 	while (running && !XNextEvent(dpy, &ev))
@@ -1460,9 +1460,9 @@ void setup(void) {
 	grabkeys();
 	focus(NULL);
 	set_wallpaper(NULL);
-	
-	static const char* picom[] = {"picom", NULL};
-	static const Arg  picom_arg = {.v = picom};
+
+	static const char *picom[]	 = {"picom", NULL};
+	static const Arg   picom_arg = {.v = picom};
 	spawn(&picom_arg);
 }
 
@@ -1481,7 +1481,7 @@ void showhide(Client *c) {
 		/* show clients top down */
 		XMoveWindow(dpy, c->win, c->x, c->y);
 		if ((!c->mon->lt[c->mon->sellt]->arrange || c->isfloating) && !c->isfullscreen) resize(c, c->x, c->y, c->w, c->h, 0);
-		showhide(c->snext); 
+		showhide(c->snext);
 	} else {
 		/* hide clients bottom up */
 		showhide(c->snext);
@@ -1903,7 +1903,6 @@ int main(int argc, char *argv[]) {
 	return EXIT_SUCCESS;
 }
 
-
 /// ===================== EXTENSIONS =========================
 void atexit_thread_cancel(void) {
 	pthread_cancel(thread_update_status_bar);
@@ -1940,7 +1939,7 @@ static void kib_to_str(char *buffer, size_t kib, char digits) {
 	sprintf(buffer, fmt, val);
 }
 
-static void do_update_statusbar(const Arg* ignored) {
+static void do_update_statusbar(const Arg *ignored) {
 	char   statusbar[1024] = {0};
 	size_t len			   = 0;
 
@@ -1976,7 +1975,7 @@ static void do_update_statusbar(const Arg* ignored) {
 		struct statvfs st;
 		statvfs("/", &st);
 		char   storage[20] = {0}, total[20] = {0};
-		size_t used		   = (st.f_blocks - st.f_bfree) * st.f_frsize;
+		size_t used = (st.f_blocks - st.f_bfree) * st.f_frsize;
 		kib_to_str(storage, used / 1024, '0');
 		kib_to_str(total, st.f_blocks * st.f_frsize / 1024, '0');
 		len += snprintf(statusbar + len, 1024 - len, " | DU %s/%s", storage, total);
@@ -1998,39 +1997,37 @@ static void do_update_statusbar(const Arg* ignored) {
 		len += strftime(statusbar + len, 1024 - len, " | %a, %e %b %R:%S ", tm);
 	}
 
-
 	XStoreName(dpy, root, statusbar);
 	XFlush(dpy);
 }
- 
-void* thread_run_update_statusbar(void* unused) {
+
+void *thread_run_update_statusbar(void *unused) {
 	for (;;) {
 		do_update_statusbar(NULL);
 		sleep(1);
 	}
 }
 
-void lock_screen(const Arg* unused) {
-	if(!fork()) {
+void lock_screen(const Arg *unused) {
+	if (!fork()) {
 		pid_t pid = fork();
 
-		if(!pid) {
+		if (!pid) {
 			setsid();
 			system("killall picom");
 			execlp("xsecurelock", "xsecurelock", NULL);
 		}
-		
+
 		wait(NULL);
 		execlp("picom", "picom", NULL);
-
 	}
 }
 
-void set_wallpaper(const Arg* unused) {
+void set_wallpaper(const Arg *unused) {
 	char *wallpaper = getenv("WALLPAPER");
 	if (!wallpaper) return;
 
-	char *wallpaper_command[] = {"feh", "--bg-scale", wallpaper, NULL};
-	const Arg a = {.v = wallpaper_command};
+	char	 *wallpaper_command[] = {"feh", "--bg-scale", wallpaper, NULL};
+	const Arg a					  = {.v = wallpaper_command};
 	spawn(&a);
 }
