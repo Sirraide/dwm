@@ -29,14 +29,18 @@
 #include <X11/keysym.h>
 #include <errno.h>
 #include <locale.h>
+#include <pthread.h>
 #include <signal.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/statvfs.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <time.h>
 #include <unistd.h>
+
 #ifdef XINERAMA
 #	include <X11/extensions/Xinerama.h>
 #endif /* XINERAMA */
@@ -259,6 +263,7 @@ static int		updategeom(void);
 static void		updatenumlockmask(void);
 static void		updatesizehints(Client *c);
 static void		updatestatus(void);
+static void 	do_update_statusbar(const Arg* ignored);
 static void		updatetitle(Client *c);
 static void		updatewindowtype(Client *c);
 static void		updatewmhints(Client *c);
@@ -269,6 +274,17 @@ static int		xerror(Display *dpy, XErrorEvent *ee);
 static int		xerrordummy(Display *dpy, XErrorEvent *ee);
 static int		xerrorstart(Display *dpy, XErrorEvent *ee);
 static void		zoom(const Arg *arg);
+
+/// EXTENSIONS
+pthread_t thread_update_status_bar;
+
+void atexit_thread_cancel(void);
+static long get_num_between(char *str, char from, char to);
+static void kib_to_str(char *buffer, size_t kib, char digits);
+static void do_update_statusbar(const Arg* unused);
+void* thread_run_update_statusbar(void* unused);
+void set_wallpaper(const Arg* unused);
+void lock_screen(const Arg* unused);
 
 /* variables */
 static const char broken[] = "broken";
@@ -1249,6 +1265,12 @@ void run(void) {
 	XEvent ev;
 	/* main event loop */
 	XSync(dpy, False);
+
+	if(pthread_create(&thread_update_status_bar, NULL, thread_run_update_statusbar, NULL))
+		die("pthread:");
+	
+	atexit(atexit_thread_cancel);
+
 	while (running && !XNextEvent(dpy, &ev))
 		if (handler[ev.type]) handler[ev.type](&ev); /* call handler */
 }
@@ -1437,6 +1459,11 @@ void setup(void) {
 	XSelectInput(dpy, root, wa.event_mask);
 	grabkeys();
 	focus(NULL);
+	set_wallpaper(NULL);
+	
+	static const char* picom[] = {"picom", NULL};
+	static const Arg  picom_arg = {.v = picom};
+	spawn(&picom_arg);
 }
 
 void seturgent(Client *c, int urg) {
@@ -1454,7 +1481,7 @@ void showhide(Client *c) {
 		/* show clients top down */
 		XMoveWindow(dpy, c->win, c->x, c->y);
 		if ((!c->mon->lt[c->mon->sellt]->arrange || c->isfloating) && !c->isfullscreen) resize(c, c->x, c->y, c->w, c->h, 0);
-		showhide(c->snext);
+		showhide(c->snext); 
 	} else {
 		/* hide clients bottom up */
 		showhide(c->snext);
@@ -1874,4 +1901,136 @@ int main(int argc, char *argv[]) {
 	cleanup();
 	XCloseDisplay(dpy);
 	return EXIT_SUCCESS;
+}
+
+
+/// ===================== EXTENSIONS =========================
+void atexit_thread_cancel(void) {
+	pthread_cancel(thread_update_status_bar);
+}
+
+static long get_num_between(char *str, char from, char to) {
+	char *end = strchr(str, to) - 1;
+	return strtol(strchr(str, from) + 1, &end, 10);
+}
+
+static void kib_to_str(char *buffer, size_t kib, char digits) {
+	static char fmt[6] = {'%', '.', '1', 'f', 'M', 0};
+	if (kib < 1000) {
+		sprintf(buffer, "%liK", kib);
+		return;
+	}
+	fmt[2]	   = CLAMP(digits, '0', '9');
+	double val = kib;
+
+	if (kib < 1000000) {
+		fmt[4] = 'M';
+		val /= 1024.0;
+	} else if (kib < 1000000000) {
+		fmt[4] = 'G';
+		val /= 1048576.0;
+	} else if (kib < 1000000000000) {
+		fmt[4] = 'T';
+		val /= 1073741824.0;
+	} else {
+		sprintf(buffer, "∞");
+		return;
+	}
+
+	sprintf(buffer, fmt, val);
+}
+
+static void do_update_statusbar(const Arg* ignored) {
+	char   statusbar[1024] = {0};
+	size_t len			   = 0;
+
+	{
+		/// CPU load
+		float load	  = 0;
+		FILE *loadavg = fopen("/proc/loadavg", "r");
+		fscanf(loadavg, "%f", &load);
+		fclose(loadavg);
+		len += snprintf(statusbar + len, 1024 - len, " CPU %i%%", (int) load);
+	}
+
+	{
+		// Memory
+		FILE *meminfo		 = fopen("/proc/meminfo", "r");
+		char  mem_total[128] = {0}, mem_free[128] = {0};
+		fgets(mem_total, 128, meminfo);
+		fgets(mem_free, 128, meminfo); // Discard second line
+		fgets(mem_free, 128, meminfo);
+		fclose(meminfo);
+
+		long mem_total_n = get_num_between(mem_total, ':', 'k');
+		long mem_used_n	 = mem_total_n - get_num_between(mem_free, ':', 'k');
+
+		kib_to_str(mem_total, mem_total_n, '1');
+		kib_to_str(mem_free, mem_used_n, '1');
+
+		len += snprintf(statusbar + len, 1024 - len, " | MEM %s/%s", mem_free, mem_total);
+	}
+
+	{
+		/// Disk usage
+		struct statvfs st;
+		statvfs("/", &st);
+		char   storage[20] = {0}, total[20] = {0};
+		size_t used		   = (st.f_blocks - st.f_bfree) * st.f_frsize;
+		kib_to_str(storage, used / 1024, '0');
+		kib_to_str(total, st.f_blocks * st.f_frsize / 1024, '0');
+		len += snprintf(statusbar + len, 1024 - len, " | DU %s/%s", storage, total);
+	}
+
+	{
+		// Battery Capacity
+		char  capacity[10] = {0};
+		FILE *battery_info = fopen("/sys/class/power_supply/BAT0/capacity", "r");
+		fgets(capacity, 10, battery_info);
+		fclose(battery_info);
+		len += snprintf(statusbar + len, 1024 - len, " | BAT %i%%", atoi(capacity));
+	}
+
+	{
+		// Date
+		time_t	   t  = time(NULL);
+		struct tm *tm = localtime(&t);
+		len += strftime(statusbar + len, 1024 - len, " | %a, %e %b %R:%S ", tm);
+	}
+
+
+	XStoreName(dpy, root, statusbar);
+	XFlush(dpy);
+}
+ 
+void* thread_run_update_statusbar(void* unused) {
+	for (;;) {
+		do_update_statusbar(NULL);
+		sleep(1);
+	}
+}
+
+void lock_screen(const Arg* unused) {
+	if(!fork()) {
+		pid_t pid = fork();
+
+		if(!pid) {
+			setsid();
+			system("killall picom");
+			execlp("xsecurelock", "xsecurelock", NULL);
+		}
+		
+		wait(NULL);
+		execlp("picom", "picom", NULL);
+
+	}
+}
+
+void set_wallpaper(const Arg* unused) {
+	char *wallpaper = getenv("WALLPAPER");
+	if (!wallpaper) return;
+
+	char *wallpaper_command[] = {"feh", "--bg-scale", wallpaper, NULL};
+	const Arg a = {.v = wallpaper_command};
+	spawn(&a);
 }

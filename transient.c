@@ -4,6 +4,11 @@
 #include <X11/Xutil.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <pthread.h>
+#include "util.h"
+
+
+////// UNUSED 
 
 int main(void) {
 	Display	*d;
@@ -24,6 +29,7 @@ int main(void) {
 	XMapWindow(d, f);
 
 	XSelectInput(d, f, ExposureMask);
+
 	while (1) {
 		XNextEvent(d, &e);
 

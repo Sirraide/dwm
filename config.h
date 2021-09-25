@@ -7,8 +7,8 @@ static const unsigned snap			  = 32;	 /* snap pixel */
 static const int	  showbar		  = 1;	 /* 0 means no bar */
 static const int	  topbar		  = 1;	 /* 0 means bottom bar */
 static const double	  defaultopacity  = 1;
-static const char	  *fonts[]		  = {"Fira Code:style=Regular:size=20:antialias=true:autohint=true"};
-static const char	  dmenufont[]	  = "Fira Code:style=Regular:size=20:antialias=true:autohint=true";
+static const char	  *fonts[]		  = {"Fira Code:style=Regular:size=18:antialias=true:autohint=true"};
+static const char	  dmenufont[]	  = "Fira Code:style=Regular:size=18:antialias=true:autohint=true";
 static const char	  col_gray1[]	  = "#222222";
 static const char	  col_gray2[]	  = "#444444";
 static const char	  col_gray3[]	  = "#bbbbbb";
@@ -72,8 +72,6 @@ static const char *termcmd[]	  = {"terminator", NULL};
 static const char *start_opera[]  = {"opera", NULL};
 static const char *start_vscode[] = {"code", NULL};
 
-static const char *screen_lock[] = {"xsecurelock", NULL};
-
 /* media keys */
 static const char *amixer_mute[]	 = {"amixer", "set", "Master", "toggle", NULL};
 static const char *amixer_increase[] = {"amixer", "set", "Master", "3+", NULL};
@@ -99,12 +97,15 @@ static Key keys[] = {
 	{0, XF86XK_MonBrightnessUp, change_brighness, {.f = .1f}},
 
 	// Miscellaneous
-	{MODKEY, XK_l, spawn, {.v = screen_lock}},
+	{MODKEY, XK_l, lock_screen, {0}},
+	{MODKEY|ShiftMask, XK_p, do_update_statusbar, {0}}, 
+	{MODKEY|ShiftMask, XK_w, set_wallpaper, {0}}, 
+	
 
 	// Opacity
-	{MODKEY | ShiftMask, XK_s, spawn, SHCMD("transset-df -a --dec .1")},
-	{MODKEY | ShiftMask, XK_d, spawn, SHCMD("transset-df -a --inc .1")},
-	{MODKEY | ShiftMask, XK_f, spawn, SHCMD("transset-df -a .75")},
+	{MODKEY | ShiftMask, XK_s, spawn, SHCMD("transset-df -a --dec .05")},
+	{MODKEY | ShiftMask, XK_d, spawn, SHCMD("transset-df -a --inc .05")},
+	{MODKEY | ShiftMask, XK_f, spawn, SHCMD("transset-df -a 1")},
 
 	// Border
 	{MODKEY | ShiftMask, XK_v, setborderpx, {.i = -5}},
