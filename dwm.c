@@ -2024,10 +2024,19 @@ void lock_screen(const Arg *unused) {
 }
 
 void set_wallpaper(const Arg *unused) {
-	char *wallpaper = getenv("WALLPAPER");
-	if (!wallpaper) return;
+	FILE* f = fopen("/home/ae/.wallpaper", "r");
+	if(!f) return;
+	char buf[1024] = {0}, *ptr;
+	fgets(buf, 1024, f);
+	fclose(f);
+	
+	if(ptr = strchr(buf, '\n'), ptr) *ptr = 0;
+	
+	FILE* wallpaper = fopen(buf, "r");
+	if(!wallpaper) return;
+	fclose(wallpaper);
 
-	char	 *wallpaper_command[] = {"feh", "--bg-scale", wallpaper, NULL};
+	char	 *wallpaper_command[] = {"feh", "--bg-scale", buf, NULL};
 	const Arg a					  = {.v = wallpaper_command};
 	spawn(&a);
 }
