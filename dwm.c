@@ -59,14 +59,45 @@
 #define TEXTW(X)	 (drw_fontset_getwidth(drw, (X)) + lrpad)
 
 /* enums */
-enum { CurNormal, CurResize, CurMove, CurLast }; /* cursor */
-enum { SchemeNorm, SchemeSel }; /* color schemes */
-enum { NetSupported, NetWMName, NetWMState, NetWMCheck,
-       NetWMFullscreen, NetActiveWindow, NetWMWindowType,
-       NetWMWindowTypeDialog, NetClientList, NetWMWindowOpacity, NetLast }; /* EWMH atoms */
-enum { WMProtocols, WMDelete, WMState, WMTakeFocus, WMLast }; /* default atoms */
-enum { ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle,
-       ClkClientWin, ClkRootWin, ClkLast }; /* clicks */
+enum {
+	CurNormal,
+	CurResize,
+	CurMove,
+	CurLast,
+}; /* cursor */
+enum {
+	SchemeNorm,
+	SchemeSel,
+}; /* color schemes */
+enum {
+	NetSupported,
+	NetWMName,
+	NetWMState,
+	NetWMCheck,
+	NetWMFullscreen,
+	NetActiveWindow,
+	NetWMWindowType,
+	NetWMWindowTypeDialog,
+	NetClientList,
+	NetWMWindowOpacity,
+	NetLast,
+}; /* EWMH atoms */
+enum {
+	WMProtocols,
+	WMDelete,
+	WMState,
+	WMTakeFocus,
+	WMLast,
+}; /* default atoms */
+enum {
+	ClkTagBar,
+	ClkLtSymbol,
+	ClkStatusText,
+	ClkWinTitle,
+	ClkClientWin,
+	ClkRootWin,
+	ClkLast,
+}; /* clicks */
 
 typedef union {
 	int			i;
@@ -162,76 +193,76 @@ static void		destroynotify(XEvent *e);
 static void		detach(Client *c);
 static void		detachstack(Client *c);
 static Monitor *dirtomon(int dir);
-static void drawbar(Monitor *m);
-static void drawbars(void);
-static void enternotify(XEvent *e);
-static void expose(XEvent *e);
-static void opacify(Client *c, double opacity);
-static void focus(Client *c);
-static void focusin(XEvent *e);
-static void focusmon(const Arg *arg);
-static void focusstack(const Arg *arg);
-static Atom getatomprop(Client *c, Atom prop);
-static int getrootptr(int *x, int *y);
-static long getstate(Window w);
-static int gettextprop(Window w, Atom atom, char *text, unsigned int size);
-static void grabbuttons(Client *c, int focused);
-static void grabkeys(void);
-static void incnmaster(const Arg *arg);
-static void keypress(XEvent *e);
-static void killclient(const Arg *arg);
-static void manage(Window w, XWindowAttributes *wa);
-static void mappingnotify(XEvent *e);
-static void maprequest(XEvent *e);
-static void monocle(Monitor *m);
-static void motionnotify(XEvent *e);
-static void movemouse(const Arg *arg);
-static Client *nexttiled(Client *c);
-static void pop(Client *);
-static void propertynotify(XEvent *e);
-static void quit(const Arg *arg);
+static void		drawbar(Monitor *m);
+static void		drawbars(void);
+static void		enternotify(XEvent *e);
+static void		expose(XEvent *e);
+static void		opacify(Client *c, double opacity);
+static void		focus(Client *c);
+static void		focusin(XEvent *e);
+static void		focusmon(const Arg *arg);
+static void		focusstack(const Arg *arg);
+static Atom		getatomprop(Client *c, Atom prop);
+static int		getrootptr(int *x, int *y);
+static long		getstate(Window w);
+static int		gettextprop(Window w, Atom atom, char *text, unsigned int size);
+static void		grabbuttons(Client *c, int focused);
+static void		grabkeys(void);
+static void		incnmaster(const Arg *arg);
+static void		keypress(XEvent *e);
+static void		killclient(const Arg *arg);
+static void		manage(Window w, XWindowAttributes *wa);
+static void		mappingnotify(XEvent *e);
+static void		maprequest(XEvent *e);
+static void		monocle(Monitor *m);
+static void		motionnotify(XEvent *e);
+static void		movemouse(const Arg *arg);
+static Client  *nexttiled(Client *c);
+static void		pop(Client *);
+static void		propertynotify(XEvent *e);
+static void		quit(const Arg *arg);
 static Monitor *recttomon(int x, int y, int w, int h);
-static void resize(Client *c, int x, int y, int w, int h, int interact);
-static void resizeclient(Client *c, int x, int y, int w, int h);
-static void resizemouse(const Arg *arg);
-static void restack(Monitor *m);
-static void run(void);
-static void scan(void);
-static int sendevent(Client *c, Atom proto);
-static void sendmon(Client *c, Monitor *m);
-static void setborderpx(const Arg *arg);
-static void setclientstate(Client *c, long state);
-static void setfocus(Client *c);
-static void setfullscreen(Client *c, int fullscreen);
-static void setlayout(const Arg *arg);
-static void setmfact(const Arg *arg);
-static void setup(void);
-static void seturgent(Client *c, int urg);
-static void showhide(Client *c);
-static void sigchld(int unused);
-static void spawn(const Arg *arg);
-static void tag(const Arg *arg);
-static void tagmon(const Arg *arg);
-static void tile(Monitor *);
-static void togglebar(const Arg *arg);
-static void togglefloating(const Arg *arg);
-static void toggletag(const Arg *arg);
-static void toggleview(const Arg *arg);
-static void unfocus(Client *c, int setfocus);
-static void unmanage(Client *c, int destroyed);
-static void unmapnotify(XEvent *e);
-static void updatebarpos(Monitor *m);
-static void updatebars(void);
-static void updateclientlist(void);
-static int updategeom(void);
-static void updatenumlockmask(void);
-static void updatesizehints(Client *c);
-static void updatestatus(void);
-static void updatetitle(Client *c);
-static void updatewindowtype(Client *c);
-static void updatewmhints(Client *c);
-static void view(const Arg *arg);
-static Client *wintoclient(Window w);
+static void		resize(Client *c, int x, int y, int w, int h, int interact);
+static void		resizeclient(Client *c, int x, int y, int w, int h);
+static void		resizemouse(const Arg *arg);
+static void		restack(Monitor *m);
+static void		run(void);
+static void		scan(void);
+static int		sendevent(Client *c, Atom proto);
+static void		sendmon(Client *c, Monitor *m);
+static void		setborderpx(const Arg *arg);
+static void		setclientstate(Client *c, long state);
+static void		setfocus(Client *c);
+static void		setfullscreen(Client *c, int fullscreen);
+static void		setlayout(const Arg *arg);
+static void		setmfact(const Arg *arg);
+static void		setup(void);
+static void		seturgent(Client *c, int urg);
+static void		showhide(Client *c);
+static void		sigchld(int unused);
+static void		spawn(const Arg *arg);
+static void		tag(const Arg *arg);
+static void		tagmon(const Arg *arg);
+static void		tile(Monitor *);
+static void		togglebar(const Arg *arg);
+static void		togglefloating(const Arg *arg);
+static void		toggletag(const Arg *arg);
+static void		toggleview(const Arg *arg);
+static void		unfocus(Client *c, int setfocus);
+static void		unmanage(Client *c, int destroyed);
+static void		unmapnotify(XEvent *e);
+static void		updatebarpos(Monitor *m);
+static void		updatebars(void);
+static void		updateclientlist(void);
+static int		updategeom(void);
+static void		updatenumlockmask(void);
+static void		updatesizehints(Client *c);
+static void		updatestatus(void);
+static void		updatetitle(Client *c);
+static void		updatewindowtype(Client *c);
+static void		updatewmhints(Client *c);
+static void		view(const Arg *arg);
+static Client  *wintoclient(Window w);
 static Monitor *wintomon(Window w);
 static int		xerror(Display *dpy, XErrorEvent *ee);
 static int		xerrordummy(Display *dpy, XErrorEvent *ee);
@@ -695,13 +726,11 @@ void opacify(Client *c, double opacity) {
 	if (BETWEEN(opacity, 0, 1)) {
 		unsigned long real_opacity[] = {opacity * 0xffffffff};
 		XChangeProperty(dpy, c->win, netatom[NetWMWindowOpacity], XA_CARDINAL,
-			32, PropModeReplace, (unsigned char*)real_opacity, 1);
+			32, PropModeReplace, (unsigned char *) real_opacity, 1);
 	} else XDeleteProperty(dpy, c->win, netatom[NetWMWindowOpacity]);
 }
 
-void
-focus(Client *c)
-{
+void focus(Client *c) {
 	if (!c || !ISVISIBLE(c))
 		for (c = selmon->stack; c && !ISVISIBLE(c); c = c->snext) {}
 	if (selmon->sel && selmon->sel != c) unfocus(selmon->sel, 0);
@@ -1248,13 +1277,11 @@ void setborderpx(const Arg *arg) {
 	else borderpx += diff;
 }
 
-void
-setclientstate(Client *c, long state)
-{
-	long data[] = { state, None };
+void setclientstate(Client *c, long state) {
+	long data[] = {state, None};
 
 	XChangeProperty(dpy, c->win, wmatom[WMState], wmatom[WMState], 32,
-		PropModeReplace, (unsigned char *)data, 2);
+		PropModeReplace, (unsigned char *) data, 2);
 }
 
 int sendevent(Client *c, Atom proto) {
@@ -1361,8 +1388,8 @@ void setup(void) {
 	netatom[NetWMFullscreen]	   = XInternAtom(dpy, "_NET_WM_STATE_FULLSCREEN", False);
 	netatom[NetWMWindowType]	   = XInternAtom(dpy, "_NET_WM_WINDOW_TYPE", False);
 	netatom[NetWMWindowTypeDialog] = XInternAtom(dpy, "_NET_WM_WINDOW_TYPE_DIALOG", False);
-	netatom[NetClientList] = XInternAtom(dpy, "_NET_CLIENT_LIST", False);
-	netatom[NetWMWindowOpacity] = XInternAtom(dpy, "_NET_WM_WINDOW_OPACITY", False);
+	netatom[NetClientList]		   = XInternAtom(dpy, "_NET_CLIENT_LIST", False);
+	netatom[NetWMWindowOpacity]	   = XInternAtom(dpy, "_NET_WM_WINDOW_OPACITY", False);
 	/* init cursors */
 	cursor[CurNormal] = drw_cur_create(drw, XC_left_ptr);
 	cursor[CurResize] = drw_cur_create(drw, XC_sizing);
