@@ -1,10 +1,12 @@
 /* See LICENSE file for copyright and license details. */
 
 /* appearance */
-static const unsigned int borderpx  = 6;        /* border pixel of windows */
+static unsigned int borderpx  = 25;        /* border pixel of windows */
+static const unsigned max_border_size = 100; /* maxium value for borderpx */
 static const unsigned int snap      = 32;       /* snap pixel */
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
+static const double defaultopacity 	= 1;
 static const char *fonts[]          = { "Fira Code:style=Regular:size=20:antialias=true:autohint=true" };
 static const char dmenufont[]       = "Fira Code:style=Regular:size=20:antialias=true:autohint=true";
 static const char col_gray1[]       = "#222222";
@@ -74,6 +76,7 @@ static const char *amixer_decrease[] = {"amixer", "set", "Master", "3-", NULL};
 
 static Key keys[] = {
 	/* modifier                     key        function        argument */
+	// Spawn programs
 	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
 	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },
 	{ MODKEY|ControlMask, 			XK_o,	   spawn,		   {.v = start_opera } },
@@ -82,13 +85,24 @@ static Key keys[] = {
 	{ 0, 							XF86XK_AudioLowerVolume, spawn, {.v = amixer_decrease } },
 	{ 0, 							XF86XK_AudioRaiseVolume, spawn, {.v = amixer_increase } },
 	{ MODKEY, 						XK_l, 	   spawn, 		   {.v = screen_lock}},
+
+	// Opacity
+	{ MODKEY|ShiftMask,		XK_s,	   spawn,	   SHCMD("transset-df -a --dec .1") },
+	{ MODKEY|ShiftMask,		XK_d,	   spawn,	   SHCMD("transset-df -a --inc .1") },
+	{ MODKEY|ShiftMask,		XK_f,	   spawn,	   SHCMD("transset-df -a .75") },
+
+	// Border
+
+	{ MODKEY|ShiftMask,		XK_v,	   setborderpx,	   {.i = -5} },
+	{ MODKEY|ShiftMask,		XK_b,	   setborderpx,	   {.i = 5} },
+
 	{ MODKEY,                       XK_b,      togglebar,      {0} },
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
 	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
 	{ MODKEY,                       XK_i,      incnmaster,     {.i = +1 } },
 	{ MODKEY,                       XK_d,      incnmaster,     {.i = -1 } },
-	{ MODKEY|ShiftMask,             XK_h,      setmfact,       {.f = -0.05} },
-	{ MODKEY|ShiftMask,             XK_l,      setmfact,       {.f = +0.05} },
+	{ MODKEY|ShiftMask,             XK_h,      setmfact,       {.f = -0.01} },
+	{ MODKEY|ShiftMask,             XK_l,      setmfact,       {.f = +0.01} },
 	{ MODKEY,                       XK_Return, zoom,           {0} },
 	{ MODKEY,                       XK_Tab,    view,           {0} },
 	{ MODKEY|ShiftMask,             XK_c,      killclient,     {0} },
